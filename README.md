@@ -1,6 +1,8 @@
 freequeue
 ==========
+
 This package provies the array based lock free queue with fixed size.
+
 Example
 =======
 Using the Queue is very simple:
