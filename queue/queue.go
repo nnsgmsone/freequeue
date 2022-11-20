@@ -20,6 +20,7 @@ import (
 )
 
 // New constructs a fixed size lockfree queue based on array
+// 	size must be a multiple of 2
 func New(size int) *Queue {
 	return &Queue{
 		size:  uint32(size),
@@ -34,7 +35,7 @@ func (q *Queue) Push(val any) {
 	if tail+q.size == head { // full
 		return
 	}
-	it := &q.items[head]
+	it := &q.items[head&uint32(len(q.items)-1)]
 	if typ := atomic.LoadPointer(&it.typ); typ != nil {
 		return
 	}
@@ -54,7 +55,7 @@ func (q *Queue) Pop() any {
 		}
 		nht := pack(head, tail+1) // new ptr
 		if atomic.CompareAndSwapUint64(&q.headTail, ht, nht) {
-			it = &q.items[tail]
+			it = &q.items[tail&uint32(len(q.items)-1)]
 			break
 		}
 	}
